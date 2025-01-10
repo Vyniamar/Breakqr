@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!title> VYNIAMAR BRUNCH 
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Tickets QR</title>
+    <style>
+        body {
+            background-color: #fff700;
+            font-family: Arial, sans-serif;
+            color: #000;
+            text-align: center;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #000;
+        }
+        .container {
+            background-color: #fff;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: auto;
+            max-width: 400px;
+            border-radius: 8px;
+        }
+        button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #fff;
+            color: #000;
+            border: 2px solid #000;
+        }
+        #logo {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #000;
+        }
+        .listPage {
+            background-color: #fff;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: auto;
+            max-width: 600px;
+            text-align: left;
+            border-radius: 8px;
+        }
+        .listPage h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" id="logo">
+        <h1>Gestion des Tickets QR</h1>
+        <h2>Invalidation de Ticket</h2>
+        <input type="text" id="name" placeholder="Nom" style="width: 90%; padding: 10px; margin-bottom: 10px;">
+        <br>
+        <input type="number" id="ticketNumber" placeholder="Numéro de ticket" style="width: 90%; padding: 10px; margin-bottom: 10px;">
+        <br>
+        <button onclick="invalidateTicket()">Invalider le Ticket</button>
+        <br>
+        <button onclick="viewInvalidTickets()">Voir les Tickets Invalidés</button>
+        <button onclick="resetInvalidTickets()">Réinitialiser</button>
+    </div>
+
+    <div id="listPage" class="hidden listPage">
+        <h2>Liste des Tickets Invalidés</h2>
+        <div id="listContent"></div>
+        <button onclick="closeListPage()">Retour</button>
+    </div>
+
+    <footer>
+        <p>© Gestion des Tickets QR - 2025</p>
+    </footer>
+
+    <script>
+        // Liste des tickets invalidés sauvegardés dans localStorage
+        let invalidTickets = JSON.parse(localStorage.getItem('invalidTickets')) || [];
+
+        // Fonction pour invalider un ticket
+        function invalidateTicket() {
+            const name = document.getElementById('name').value.trim();
+            const ticketNumber = document.getElementById('ticketNumber').value.trim();
+
+            if (!name || !ticketNumber) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+
+            if (invalidTickets.some(ticket => ticket.number === ticketNumber)) {
+                alert(`Le ticket #${ticketNumber} est déjà invalidé.`);
+                return;
+            }
+
+            const date = new Date().toLocaleString();
+            invalidTickets.push({ name, number: ticketNumber, date });
+            localStorage.setItem('invalidTickets', JSON.stringify(invalidTickets));
+
+            alert(`Le ticket #${ticketNumber} pour ${name} a été invalidé.`);
+            document.getElementById('name').value = '';
+            document.getElementById('ticketNumber').value = '';
+        }
+
+        // Fonction pour afficher les tickets invalidés
+        function viewInvalidTickets() {
+            const listPage = document.getElementById('listPage');
+            const listContent = document.getElementById('listContent');
+            listContent.innerHTML = '';
+
+            if (invalidTickets.length === 0) {
+                listContent.innerHTML = '<p>Aucun ticket invalidé.</p>';
+            } else {
+                invalidTickets.forEach(ticket => {
+                    listContent.innerHTML += `<p>Nom: ${ticket.name} | Ticket #: ${ticket.number} | Date: ${ticket.date}</p>`;
+                });
+            }
+
+            document.querySelector('.container').classList.add('hidden');
+            listPage.classList.remove('hidden');
+        }
+
+        // Fonction pour fermer la page des tickets invalidés
+        function closeListPage() {
+            document.getElementById('listPage').classList.add('hidden');
+            document.querySelector('.container').classList.remove('hidden');
+        }
+
+        // Fonction pour réinitialiser les tickets invalidés
+        function resetInvalidTickets() {
+            if (confirm('Voulez-vous vraiment réinitialiser les tickets invalidés ?')) {
+                invalidTickets = [];
+                localStorage.setItem('invalidTickets', JSON.stringify(invalidTickets));
+                alert('Liste des tickets invalidés réinitialisée.');
+            }
+        }
+    </script>
+</body>
+</html>
